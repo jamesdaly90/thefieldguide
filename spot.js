@@ -1,5 +1,4 @@
 <!-- Login -->
-<script>
 document.getElementById('login-button').addEventListener('click', function(event) {
     event.preventDefault();
     const xano_input = {
@@ -26,10 +25,8 @@ document.getElementById('login-button').addEventListener('click', function(event
         }
     });
 });
-</script>
 
 <!-- Get User Data, Add Username to Nav, Add Profile Picture to Nav, and Hide/Show Nav Elements -->
-<script>
 function GetUserData() {
     const authToken = localStorage.getItem('AuthToken');
     return fetch("https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/auth/me", {
@@ -74,20 +71,16 @@ window.onload = function() {
         GetUserData();
     }
 }
-</script>
 
 <!-- Logout -->
-<script>
 document.getElementById('user-container').addEventListener('click', function() {
     localStorage.removeItem('AuthToken');
     location.href = "/";
 });
-</script>
 
 
 
 
-<script>
 // Extract spot ID from URL query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const spotId = urlParams.get('id');
@@ -309,5 +302,3 @@ form.addEventListener('submit', async function(event) {
     console.error('Error:', error);
   });
 });
-
-</script>
