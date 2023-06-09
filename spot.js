@@ -120,47 +120,10 @@ async function fetchPhotos() {
 }
 
 async function fetchComments() {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
-    const comments = await response.json();
+  const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
+  const comments = await response.json();
   
-    // Display each comment
-    await Promise.all(comments.map(displayComment));
-}
-
-async function displayComment(comment) {
-    // If the user object is not embedded in the comment, fetch the user data
-    if (!comment.user) {
-        const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/user/${comment.user_id}`);
-        comment.user = await response.json();
-    }
-
-    // Get elements for comment's user name and profile image
-    const usernameElement = document.querySelector(`#comment-${comment.id}-username`);
-    const profilePicElement = document.querySelector(`#comment-${comment.id}-profile-pic`);
-  
-    // Update these elements with the user data from the comment
-    usernameElement.textContent = comment.user.username;
-    profilePicElement.src = comment.user.profile_picture.url;
-}
-
-async function fetchSpot() {
-  try {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spots/${spotId}`);
-    const spot = await response.json();
-    displaySpot(spot);
-  } catch (error) {
-    console.error('Error fetching spot:', error);
-  }
-}
-
-async function fetchPhotos() {
-  try {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/photos_filter?spots_id=${spotId}`);
-    const photos = await response.json();
-    displayPhotos(photos);
-  } catch (error) {
-    console.error('Error fetching photos:', error);
-  }
+  displayComments(comments);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
