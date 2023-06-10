@@ -1,5 +1,4 @@
-<!-- Login -->
-<script>
+/* Login */
 document.getElementById('login-button').addEventListener('click', function(event) {
     event.preventDefault();
     const xano_input = {
@@ -26,10 +25,8 @@ document.getElementById('login-button').addEventListener('click', function(event
         }
     });
 });
-</script>
 
-<!-- Get User Data, Add Username to Nav, Add Profile Picture to Nav, and Hide/Show Nav Elements -->
-<script>
+/* Get User Data, Add Username to Nav, Add Profile Picture to Nav, and Hide/Show Nav Elements */
 function GetUserData() {
     const authToken = localStorage.getItem('AuthToken');
     return fetch("https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/auth/me", {
@@ -74,20 +71,16 @@ window.onload = function() {
         GetUserData();
     }
 }
-</script>
 
-<!-- Logout -->
-<script>
+/* Logout  */
 document.getElementById('user-container').addEventListener('click', function() {
     localStorage.removeItem('AuthToken');
     location.href = "/";
 });
-</script>
 
 
 
 
-<script>
 // Extract spot ID from URL query parameter
 const urlParams = new URLSearchParams(window.location.search);
 const spotId = urlParams.get('id');
@@ -127,47 +120,10 @@ async function fetchPhotos() {
 }
 
 async function fetchComments() {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
-    const comments = await response.json();
+  const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
+  const comments = await response.json();
   
-    // Display each comment
-    await Promise.all(comments.map(displayComment));
-}
-
-async function displayComment(comment) {
-    // If the user object is not embedded in the comment, fetch the user data
-    if (!comment.user) {
-        const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/user/${comment.user_id}`);
-        comment.user = await response.json();
-    }
-
-    // Get elements for comment's user name and profile image
-    const usernameElement = document.querySelector(`#comment-${comment.id}-username`);
-    const profilePicElement = document.querySelector(`#comment-${comment.id}-profile-pic`);
-  
-    // Update these elements with the user data from the comment
-    usernameElement.textContent = comment.user.username;
-    profilePicElement.src = comment.user.profile_picture.url;
-}
-
-async function fetchSpot() {
-  try {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spots/${spotId}`);
-    const spot = await response.json();
-    displaySpot(spot);
-  } catch (error) {
-    console.error('Error fetching spot:', error);
-  }
-}
-
-async function fetchPhotos() {
-  try {
-    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/photos_filter?spots_id=${spotId}`);
-    const photos = await response.json();
-    displayPhotos(photos);
-  } catch (error) {
-    console.error('Error fetching photos:', error);
-  }
+  displayComments(comments);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -309,5 +265,3 @@ form.addEventListener('submit', async function(event) {
     console.error('Error:', error);
   });
 });
-
-</script>
