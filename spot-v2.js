@@ -123,10 +123,12 @@ async function fetchComments() {
   const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
   const comments = await response.json();
   
-  // log the fetched comments to the console
-  console.log(comments);
-  
-  // and then proceed with displaying the comments as before
+  // add a line here to add the user data to each comment
+  comments.forEach(comment => {
+    comment.user = comment._user;
+    delete comment._user;  // delete the _user field now that we've copied its data to the user field
+  });
+
   displayComments(comments);
 }
 
