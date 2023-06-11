@@ -269,40 +269,42 @@ let form = document.getElementById('wf-form-spot-comment-form');
 let params = new URLSearchParams(window.location.search);
 let spot_id = params.get('id');
 
-form.addEventListener('submit', async function(event) {
+form.addEventListener('submit', function(event) {
   event.preventDefault();
   let text = document.getElementById('name').value;
-  const currentUser = await GetUserData();
 
-  fetch('https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      spot_id: spot_id,
-      text: text,
-      user_id: currentUser.id,
-      user_name: currentUser.username
-    }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-    document.getElementById('name').value = '';
-    let currentDate = new Date();
-    let formattedDate = currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  GetUserData().then(currentUser => {
+    fetch('https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        spot_id: spot_id,
+        text: text,
+        user_id: currentUser.id,
+        user_name: currentUser.username
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      document.getElementById('name').value = '';
+      let currentDate = new Date();
+      let formattedDate = currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    const newComment = await generateCommentElement({
-      id: data.id,
-      created_at: currentDate,
-      text: text,
-      user: currentUser
-    }, false);
-    const commentContainer = document.getElementById('comment-container');
-    commentContainer.prepend(newComment);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
+      generateCommentElement({
+        id: data.id,
+        created_at: currentDate,
+        text: text,
+        user: currentUser
+      }, false).then(newComment => {
+        const commentContainer = document.getElementById('comment-container');
+        commentContainer.prepend(newComment);
+      });
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   });
 });
