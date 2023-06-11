@@ -195,9 +195,12 @@ function displayComments(comments) {
   });
 }
 
-function generateCommentElement(comment, isReply) {
+async function generateCommentElement(comment, isReply) {
   const template = isReply ? document.querySelector('#reply-comment-template') : document.querySelector('.comment-template');
   const clone = template.cloneNode(true);
+
+  // Assign comment id to the element for future reference
+  clone.dataset.id = comment.id;
 
   if (isReply) {
     clone.querySelector('.comment-reply-content').textContent = comment.text;
@@ -215,6 +218,15 @@ function generateCommentElement(comment, isReply) {
     clone.querySelector('#comment-pfp').src = comment.user.profile_picture.url;
   }
 
+  // Check if the comment author is the same as the logged in user
+  const currentUser = await GetUserData();
+  if (comment.user && comment.user.id === currentUser.id) {
+    // Show delete button and bind the click event
+    const deleteButton = clone.querySelector('#delete-comment-button');
+    deleteButton.style.display = 'block';
+    deleteButton.addEventListener('click', handleDeleteComment.bind(this, comment.id));
+  }
+
   // Unhide the cloned comment template and set its display to flex
   clone.style.display = 'flex';
 
@@ -227,57 +239,67 @@ function generateCommentElement(comment, isReply) {
   return clone;
 }
 
-// Getting form element
-let form = document.getElementById('wf-form-spot-comment-form');
+async function handleDeleteComment(commentId) {
+  // Hide delete button and show confirmation button
+  document.querySelector(`.comment[data-id="${commentId}"] #delete-comment-button`).style.display = 'none';
+  document.querySelector(`.comment[data-id="${commentId}"] #delete-comment-confirmation`).style.display = 'block';
 
-// Getting spot_id from URL
+  document.querySelector(`.comment[data-id="${commentId}"] #delete-comment-confirmation`).addEventListener('click', async function() {
+    // Delete comment from Xano
+    const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('AuthToken')
+      }
+    });
+
+    const result = await response.json();
+
+    if (response.status === 200) {
+      // Remove comment element from the DOM
+      document.querySelector(`.comment[data-id="${commentId}"]`).remove();
+    } else {
+      console.error('Failed to delete comment:', result);
+    }
+  });
+}
+
+let form = document.getElementById('wf-form-spot-comment-form');
 let params = new URLSearchParams(window.location.search);
 let spot_id = params.get('id');
 
-// Adding an event listener for form submission
 form.addEventListener('submit', async function(event) {
-  // Preventing default form submission
   event.preventDefault();
-
-  // Getting the input field value
   let text = document.getElementById('name').value;
-
-  // Get current user data
   const currentUser = await GetUserData();
 
-  // Making a POST request to the Xano API
   fetch('https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-    spot_id: spot_id,
-    text: text,
-    user_id: currentUser.id, //assuming that the user object has an id property
-    user_name: currentUser.username
-}),
+      spot_id: spot_id,
+      text: text,
+      user_id: currentUser.id,
+      user_name: currentUser.username
+    }),
   })
   .then(response => response.json())
   .then(data => {
     console.log('Success:', data);
-
-    // Clear the input field
     document.getElementById('name').value = '';
-
-    // Get current date
     let currentDate = new Date();
     let formattedDate = currentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // Clone comment template and fill it with new data
-    const newComment = generateCommentElement({
+    const newComment = await generateCommentElement({
+      id: data.id,
       created_at: currentDate,
       text: text,
-      user: currentUser // Pass the entire user object instead
+      user: currentUser
     }, false);
     const commentContainer = document.getElementById('comment-container');
-
-    // Prepend the new comment to the comment section
     commentContainer.prepend(newComment);
   })
   .catch((error) => {
