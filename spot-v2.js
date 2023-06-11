@@ -123,6 +123,10 @@ async function fetchComments() {
   const response = await fetch(`https://x8ki-letl-twmt.n7.xano.io/api:FaycGcla/spot_comment_filter?spot_id=${spotId}`);
   const comments = await response.json();
   
+  // log the fetched comments to the console
+  console.log(comments);
+  
+  // and then proceed with displaying the comments as before
   displayComments(comments);
 }
 
