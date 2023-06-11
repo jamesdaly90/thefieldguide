@@ -132,10 +132,23 @@ async function fetchComments() {
   displayComments(comments);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   fetchSpot();
   fetchPhotos();
   fetchComments();
+
+  // Check if user is logged in
+  if(localStorage.getItem('AuthToken') !== null) {
+    // Fetch user data and set profile picture
+    const currentUser = await GetUserData();
+
+    // Check if user's profile picture is available
+    if (currentUser.profile_picture && currentUser.profile_picture.url) {
+      const profilePicElement = document.getElementById('new-comment-pfp');
+      profilePicElement.src = currentUser.profile_picture.url;
+      profilePicElement.srcset = "";  // Clear srcset
+    }
+  }
 });
 
 function displayPhotos(photos) {
