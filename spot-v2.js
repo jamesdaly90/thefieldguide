@@ -171,7 +171,7 @@ function displayPhotos(photos) {
   inspoTemplate.remove();
 }
 
-function displayComments(comments) {
+async function displayComments(comments) {
   const template = document.querySelector('.comment-template');
   template.style.display = 'none'; // Hide the template
 
@@ -183,16 +183,16 @@ function displayComments(comments) {
   const replies = comments.filter(comment => comment.spot_comment_id !== 0 && comment.spot_comment_id !== null);
 
   // Generate and append parent comments
-  parents.forEach((parent) => {
-    const parentElement = generateCommentElement(parent, false);
+  for (let parent of parents) {
+    const parentElement = await generateCommentElement(parent, false);
     document.querySelector('#comment-container').appendChild(parentElement);
 
     // Generate and append this parent's replies
-    replies.filter(reply => reply.spot_comment_id === parent.id).forEach((reply) => {
-      const replyElement = generateCommentElement(reply, true);
+    for (let reply of replies.filter(reply => reply.spot_comment_id === parent.id)) {
+      const replyElement = await generateCommentElement(reply, true);
       parentElement.querySelector('.replies-container').appendChild(replyElement);
-    });
-  });
+    };
+  };
 }
 
 async function generateCommentElement(comment, isReply) {
